@@ -1,7 +1,4 @@
 import nzae
-import json
-import requests
-import sklearn
 
 # DAI needs to write to the current working directory (which by default
 # appears to be root /). Change to /tmp, which all processes should have
