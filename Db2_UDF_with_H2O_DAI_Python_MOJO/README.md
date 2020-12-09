@@ -9,5 +9,5 @@ H2O Driverless AI Python Runtime Setup:
 Steps:
 - Create database: db2 create database testdb
 - Create function: db2 -tvf create_function.sql
-- Edit iris_predict_udf.py: Change mojoFilename variable to point to location of the MOJO file
+- Edit iris_predict_pm_udf.py: Change mojoFilename variable to point to location of the MOJO file
 - Call function:   db2 -tvf call_function.sql
