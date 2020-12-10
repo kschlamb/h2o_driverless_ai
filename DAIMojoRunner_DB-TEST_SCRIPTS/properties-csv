@@ -1,0 +1,8 @@
+ModelName=/home/db2inst1/MOJO_Pipelines/iris-pipeline.mojo
+SQLConnectionString=jdbc:db2://127.0.0.1:50000/TESTDB
+SQLUser=db2inst1
+# Password: password (generate with: echo password | base64 -i -)
+SQLPassword=cGFzc3dvcmQK
+SQLWrite=CSV
+SQLKey=ROW_ID
+SQLSelect=select row_id, sepal_length, sepal_width, petal_length, petal_width from iris order by row_id
