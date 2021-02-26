@@ -29,10 +29,7 @@
 *
 *      Note: The mojo2-runtime.jar file downloaded from the DAI GUI is for
 *            little-endian platforms only and doesn't work on AIX. Download
-*            one that can be used for AIX at the location below. There are
-*            some differences in the content, which is why there are spots
-*            in the app's code below that works differently between Linux
-*            on x86 and AIX on Power.
+*            one that can be used for AIX at the location below.
 *
 *            - http://artifacts.h2o.ai.s3.amazonaws.com/releases/ai/h2o/mojo2-runtime/2.5.10/any/mojo2-runtime-2.5.10-all.jar
 *
