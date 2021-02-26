@@ -24,8 +24,17 @@
 *
 *  - Driverless AI license must be setup prior to running the app.
 *
-*  - Compile: javac -cp mojo2-runtime-2.1.4-all.jar dai_mojo_db2_iris.java
-*  - Run:     java -cp .:mojo2-runtime-2.1.4-all.jar:/opt/ibm/db2/v11.5/java/db2jcc4.jar dai_mojo_db2_iris <parms>
+*  - Compile: javac -cp mojo2-runtime.jar dai_mojo_db2_iris.java
+*  - Run:     java -cp .:mojo2-runtime.jar:/opt/ibm/db2/v11.5/java/db2jcc4.jar dai_mojo_db2_iris <parms>
+*
+*      Note: The mojo2-runtime.jar file downloaded from the DAI GUI is for
+*            little-endian platforms only and doesn't work on AIX. Download
+*            one that can be used for AIX at the location below. There are
+*            some differences in the content, which is why there are spots
+*            in the app's code below that works differently between Linux
+*            on x86 and AIX on Power.
+*
+*            - http://artifacts.h2o.ai.s3.amazonaws.com/releases/ai/h2o/mojo2-runtime/2.5.10/any/mojo2-runtime-2.5.10-all.jar
 *
 *  - Usage:   dai_mojo_db2_iris <Server IP> <Port #> <DBname> <UserID> <Password> <Table> <MOJO File>
 *
@@ -38,7 +47,8 @@ import ai.h2o.mojos.runtime.frame.MojoFrame;
 import ai.h2o.mojos.runtime.frame.MojoFrameBuilder;
 import ai.h2o.mojos.runtime.frame.MojoRowBuilder;
 import ai.h2o.mojos.runtime.lic.LicenseException;
-import ai.h2o.mojos.runtime.utils.SimpleCSV;
+import ai.h2o.mojos.runtime.utils.CsvWritingBatchHandler;
+import com.opencsv.CSVWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -146,13 +156,13 @@ public class dai_mojo_db2_iris
          // all of the rows read in from the Db2 table.
 
          final MojoFrame inputFrame = frameBuilder.toMojoFrame();
-         //inputFrame.debug();
+         //inputFrame.debug();  // Uncomment to display frame contents.
 
          // Score the data in the input frame, with the results going into
          // an output frame.
 
          final MojoFrame outputFrame = model.transform(inputFrame);
-         //outputFrame.debug();
+         //outputFrame.debug();  // Uncomment to display frame contents.
 
          // Display the predictions to the screen as a CSV. This includes the
          // class labels as the first row, followed by the confidence levels
@@ -160,8 +170,22 @@ public class dai_mojo_db2_iris
          // easily be modified to write to a file, or to a Db2 table.
 
          System.out.print("== Predictions (CSV):\n");
-         SimpleCSV outputCSV = SimpleCSV.read(outputFrame);
-         outputCSV.write(System.out);
+         final Writer writer = new BufferedWriter(new OutputStreamWriter(System.out));
+         // The final two parameters for the CSVWriter constructor here aren't
+         // correct, but it's fine for this particular usage as I only care
+         // about the separator character, which is the first one. The usage
+         // in H2O's examples aren't working for me on both Linux and AIX so
+         // I'm going with the code below, which does.
+         final CSVWriter csvWriter = new CSVWriter(writer, ',', '*', '*');
+         CsvWritingBatchHandler.csvWriteFrame(csvWriter, outputFrame, true);
+
+         // Close the various handles opened.
+
+         System.out.print("== Closing handles... ");
+         results.close();
+         stmt.close();
+         con.close();
+         System.out.print("Complete\n");
 
          System.out.print("== Exiting\n");
       }
